@@ -1,0 +1,18 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "sayuraya-backend"
+main = "src/index.ts"
+compatibility_date = "2026-05-02"
+
+# [vars]
+# GEMINI_API_KEY = "..."
+# GOOGLE_SHEETS_API_KEY = "..."
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "sayuraya_index"
+
+[ai]
+binding = "AI"
+
+[observability]
+enabled = true

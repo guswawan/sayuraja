@@ -1,0 +1,8 @@
+Product_ID,Product_Name,Category,Price_Number,Unit,Stock_Status,Search_Alias
+SYR-001,Bayam Hijau,Sayuran Daun,5000,Ikat,In Stock,"Bayem, sayur hijau"
+SYR-002,Tomat Merah,Sayuran Buah,15000,Kg,Out of Stock,"Tomat sayur, tomat medan"
+SYR-003,Wortel Lokal,Umbi-umbian,12000,Kg,In Stock,"Wortel sop, carrot"
+SYR-004,Kangkung Cabut,Sayuran Daun,4000,Ikat,In Stock,Kangkung akar
+SYR-005,Cabai Rawit Merah,Bumbu Dapur,65000,Kg,In Stock,"Cabe setan, cabe pedas"
+SYR-006,Telur Ayam Negeri,Protein,28000,Kg,In Stock,Telor ayam
+SYR-007,Jeruk Peras,Buah,18000,Kg,Out of Stock,Jeruk manis
