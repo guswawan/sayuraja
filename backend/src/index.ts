@@ -40,9 +40,9 @@ async function syncData(env: Env) {
 		
 		const context = (contextCol && contextCol !== "#ERROR!") 
 			? contextCol 
-			: `Product ${name} (${alias || ""}) belongs to the ${category} category. The current price is Rp ${price} per ${unit}. Current stock status: ${stock}.`;
+			: `Produk ${name} (${alias || ""}) masuk kategori ${category}. Harga sekarang Rp ${price} per ${unit}. Status stok saat ini: ${stock}.`;
 
-		const { data } = await env.AI.run("@cf/baai/bge-base-en-v1.5", {
+		const { data } = await env.AI.run("@cf/baai/bge-m3", {
 			text: [context],
 		});
 
@@ -59,7 +59,7 @@ async function syncData(env: Env) {
 		if (!info || !description) continue;
 
 		const context = `${info}: ${description}`;
-		const { data } = await env.AI.run("@cf/baai/bge-base-en-v1.5", {
+		const { data } = await env.AI.run("@cf/baai/bge-m3", {
 			text: [context],
 		});
 
@@ -134,54 +134,71 @@ export default {
 			}
 		} else if (url.pathname === "/api/chat" && request.method === "POST") {
 			try {
-				const { query } = (await request.json()) as { query: string };
+				const { query, history } = (await request.json()) as { 
+					query: string, 
+					history?: { role: string, content: string }[] 
+				};
 				if (!query) return new Response("Missing query", { status: 400 });
 
-				// 1. Generate embedding for the query
-				const { data: queryEmbed } = await env.AI.run("@cf/baai/bge-base-en-v1.5", {
-					text: [query],
-				});
+				// 1. Context-Aware Query Expansion
+				// We need to know what the user is talking about if they say "kalau itu?"
+				let searchQueries = [query];
+				if (history && history.length > 0) {
+					const lastAssistantMsg = history.filter(h => h.role === "assistant").pop()?.content || "";
+					// If the query is short/ambiguous, we'll try to find relevant products mentioned in history
+					const contextKeywords = lastAssistantMsg.match(/[A-Z][a-z]+/g) || [];
+					if (contextKeywords.length > 0 && query.length < 20) {
+						searchQueries.push(`${query} ${contextKeywords.join(" ")}`);
+					}
+				}
 
-				// 2. Search Vectorize
-				const matches = await env.VECTORIZE.query(queryEmbed[0], {
+				// 2. Search Vectorize using expanded queries
+				const queryEmbed = await env.AI.run("@cf/baai/bge-m3", { text: [searchQueries.join(" ")] });
+				const matches = await env.VECTORIZE.query(queryEmbed.data[0], {
 					topK: 5,
 					returnValues: false,
 					returnMetadata: true,
 				});
 
-				// Filter matches by score to prevent "vague" similarities from becoming facts
-				// A score of 0.6-0.7 is usually a good threshold for "relevant enough"
-				const relevantMatches = matches.matches.filter(m => m.score > 0.65);
+				const relevantMatches = matches.matches.filter(m => m.score > 0.45);
 
-				const context = relevantMatches.length > 0 
-					? relevantMatches.map((m) => {
+				let systemPrompt = "";
+
+				if (relevantMatches.length > 0) {
+					const context = relevantMatches.map((m) => {
 						if (m.metadata?.type === "product") {
-							return `Product ${m.metadata.name} (${m.metadata.category}) costs Rp ${m.metadata.price} per ${m.metadata.unit}. Stock: ${m.metadata.stock}.`;
+							return `- Produk: ${m.metadata.name}, Harga: Rp ${m.metadata.price}/${m.metadata.unit}, Stok: ${m.metadata.stock}.`;
 						} else {
-							return `${m.metadata?.info}: ${m.metadata?.description || ""}`;
+							return `- Info: ${m.metadata?.info}: ${m.metadata?.description || ""}`;
 						}
-					}).join("\n")
-					: "TIDAK ADA DATA YANG RELEVAN DI DATABASE.";
+					}).join("\n");
 
-				// 3. Call Cloudflare Workers AI (Llama 3.1) with Streaming
-				const systemPrompt = `You are the official virtual assistant for 'Sayuraya'. 
+					systemPrompt = `Kamu adalah Admin Sayuraya. Jawab santai, ramah, dan JUJUR.
 
-STRICT GROUNDING RULES:
-1. ONLY answer based on the CONTEXT FROM DATABASE provided below.
-2. If the user asks for a product that is NOT explicitly mentioned in the context, you MUST say that the product is currently unavailable. 
-3. DO NOT guess, DO NOT use your internal knowledge about vegetable prices, and DO NOT make up products.
-4. If the context says "TIDAK ADA DATA YANG RELEVAN", tell the customer politely that we don't have that item yet.
+DATA DATABASE:
+${context}
 
-TONE: Casual but professional Indonesian admin ("Kak").
+PANDUAN:
+1. Jawab singkat layaknya admin toko.
+2. Gunakan sapaan "Kak" atau "Kakak" SECUKUPNYA saja (jangan di setiap kalimat).
+3. Jika barang di DATA stoknya "Out of Stock", bilang lagi kosong.
+4. Jika barang TIDAK ADA di DATA, bilang jujur belum ada infonya.
+5. INGAT KONTEKS: Jika pembeli tanya lanjutan (misal: "harganya?"), lihat sejarah chat untuk tahu barang apa yang dimaksud.`;
+				} else {
+					systemPrompt = `Kamu adalah Admin Sayuraya. Pelanggan bertanya sesuatu yang tidak ada di database kita. 
+Katakan dengan ramah kamu belum ada info soal itu dan ajak cek produk lain. Sapaan "Kak" seperlunya saja.`;
+				}
 
-CONTEXT FROM DATABASE:
-${context}`;
+				// Construct full messages array for the LLM including history
+				const messages = [
+					{ role: "system", content: systemPrompt },
+					...(history || []),
+					{ role: "user", content: query }
+				];
 
-				const aiStream = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
-					messages: [
-						{ role: "system", content: systemPrompt },
-						{ role: "user", content: query },
-					],
+				// 3. Call Cloudflare Workers AI (GLM 4.7 Flash) with Streaming
+				const aiStream = await env.AI.run("@cf/zai-org/glm-4.7-flash", {
+					messages,
 					stream: true,
 				});
 

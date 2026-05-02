@@ -16,20 +16,20 @@ export const ChatWidget: React.FC = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom whenever messages or loading state changes
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // Auto-scroll logic
   useEffect(() => {
-    scrollToBottom();
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages, isLoading]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
     const userMsg = input.trim();
+    // Add user message and set loading
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setInput('');
     setIsLoading(true);
@@ -38,12 +38,15 @@ export const ChatWidget: React.FC = () => {
       const response = await fetch('https://sayuraya-backend.agsndoes6.workers.dev/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: userMsg }),
+        body: JSON.stringify({ 
+          query: userMsg,
+          history: messages.slice(-5).map(m => ({ role: m.role, content: m.content }))
+        }),
       });
 
       if (!response.ok) throw new Error('API Error');
 
-      // Add empty assistant message to be filled by stream
+      // Add empty assistant message IMMEDIATELY to reduce perceived latency
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
       
       const reader = response.body?.getReader();
@@ -62,8 +65,11 @@ export const ChatWidget: React.FC = () => {
             if (line.startsWith('data: ')) {
               try {
                 const data = JSON.parse(line.slice(6));
-                if (data.response) {
-                  assistantContent += data.response;
+                // Handle different stream formats (Llama, Kimi, GLM)
+                const contentChunk = data.response || data.choices?.[0]?.delta?.content || '';
+                
+                if (contentChunk) {
+                  assistantContent += contentChunk;
                   setMessages(prev => {
                     const newMessages = [...prev];
                     newMessages[newMessages.length - 1].content = assistantContent;
@@ -71,14 +77,14 @@ export const ChatWidget: React.FC = () => {
                   });
                 }
               } catch (e) {
-                // Ignore parse errors for non-JSON lines
+                // Ignore parsing errors
               }
             }
           }
         }
       }
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Maaf Kak, sepertinya koneksi bermasalah." }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: "Maaf Kak, sepertinya koneksi sedang bermasalah. Coba lagi ya!" }]);
     } finally {
       setIsLoading(false);
     }
@@ -102,8 +108,8 @@ export const ChatWidget: React.FC = () => {
       )}
 
       {isOpen && (
-        <Card className="w-80 sm:w-96 h-[500px] flex flex-col shadow-2xl border-green-100 bg-white">
-          <CardHeader className="bg-green-600 text-white rounded-t-lg py-3 flex flex-row items-center justify-between">
+        <Card className="w-80 sm:w-96 h-[500px] flex flex-col shadow-2xl border-green-100 bg-white overflow-hidden">
+          <CardHeader className="bg-green-600 text-white py-3 flex flex-row items-center justify-between shrink-0">
             <CardTitle className="text-lg flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
               Sayuraya Concierge
@@ -113,8 +119,8 @@ export const ChatWidget: React.FC = () => {
             </Button>
           </CardHeader>
           
-          <CardContent className="flex-1 overflow-hidden p-0">
-            <ScrollArea className="h-full p-4">
+          <CardContent className="flex-1 overflow-hidden p-0 bg-white">
+            <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
               <div className="space-y-4">
                 {messages.length === 0 && (
                   <div className="text-center text-gray-500 mt-10">
@@ -123,41 +129,42 @@ export const ChatWidget: React.FC = () => {
                 )}
                 {messages.map((m, i) => (
                   <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-lg p-3 ${
-                      m.role === 'user' ? 'bg-green-100 text-green-900' : 'bg-gray-100 text-gray-900'
+                    <div className={`max-w-[85%] rounded-2xl px-4 py-2 ${
+                      m.role === 'user' 
+                        ? 'bg-green-600 text-white rounded-tr-none' 
+                        : 'bg-gray-100 text-gray-900 rounded-tl-none shadow-sm'
                     }`}>
-                      {m.content}
+                      {m.content || (isLoading && i === messages.length - 1 ? (
+                        <span className="flex gap-1 items-center py-1">
+                          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                        </span>
+                      ) : null)}
                     </div>
                   </div>
                 ))}
-                {isLoading && messages[messages.length-1]?.role === 'user' && (
-                  <div className="flex justify-start">
-                    <div className="bg-gray-100 rounded-lg p-3 animate-pulse">
-                      Mengetik...
-                    </div>
-                  </div>
-                )}
-                {/* Dummy div to anchor the scroll */}
-                <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} className="h-2" />
               </div>
             </ScrollArea>
           </CardContent>
 
-          <CardFooter className="p-3 border-t flex flex-col gap-2">
+          <CardFooter className="p-3 border-t flex flex-col gap-2 shrink-0 bg-white">
             <div className="flex w-full gap-2">
               <Input 
                 placeholder="Tanya harga bayam..." 
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                className="focus-visible:ring-green-600"
+                className="focus-visible:ring-green-600 rounded-xl"
+                disabled={isLoading}
               />
-              <Button onClick={sendMessage} disabled={isLoading} size="icon" className="bg-green-600 hover:bg-green-700">
+              <Button onClick={sendMessage} disabled={isLoading || !input.trim()} size="icon" className="bg-green-600 hover:bg-green-700 rounded-xl">
                 <Send className="h-4 w-4" />
               </Button>
             </div>
             {messages.length > 0 && !isLoading && (
-              <Button className="w-full bg-green-500 hover:bg-green-600 p-0">
+              <Button className="w-full bg-green-500 hover:bg-green-600 p-0 rounded-xl shadow-sm">
                 <a href={getWhatsAppLink()} target="_blank" rel="noopener noreferrer" className="w-full h-full flex items-center justify-center">
                   Order via WhatsApp
                 </a>
