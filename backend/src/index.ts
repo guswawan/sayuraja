@@ -44,7 +44,7 @@ async function syncData(env: Env) {
 		
 		const context = (contextCol && contextCol !== "#ERROR!") 
 			? contextCol 
-			: `Produk ${name} (${alias || ""}) masuk kategori ${category}. Harga sekarang Rp ${price} per ${unit}. Status stok saat ini: ${stock}.`;
+			: `Produk: ${name}. Kategori: ${category}. Alias/Sinonim: ${alias || ""}. Harga: Rp ${price} per ${unit}. Stok: ${stock}. Deskripsi: Jual ${name} segar berkualitas untuk kebutuhan dapur Kakak.`;
 
 		const { data } = await env.AI.run("@cf/baai/bge-m3", {
 			text: [context],
@@ -150,26 +150,24 @@ export default {
 				if (!query) return new Response("Missing query", { status: 400 });
 
 				// 1. Context-Aware Query Expansion
-				// We need to know what the user is talking about if they say "kalau itu?"
-				let searchQueries = [query];
+				let expandedQuery = query;
 				if (history && history.length > 0) {
-					const lastAssistantMsg = history.filter(h => h.role === "assistant").pop()?.content || "";
-					// If the query is short/ambiguous, we'll try to find relevant products mentioned in history
-					const contextKeywords = lastAssistantMsg.match(/[A-Z][a-z]+/g) || [];
-					if (contextKeywords.length > 0 && query.length < 20) {
-						searchQueries.push(`${query} ${contextKeywords.join(" ")}`);
+					const recentHistory = history.slice(-3).map(h => h.content).join(" ");
+					// If query is short, append recent history context
+					if (query.length < 15) {
+						expandedQuery = `${query} ${recentHistory}`;
 					}
 				}
 
-				// 2. Search Vectorize using expanded queries
-				const queryEmbed = await env.AI.run("@cf/baai/bge-m3", { text: [searchQueries.join(" ")] });
+				// 2. Search Vectorize using expanded query
+				const queryEmbed = await env.AI.run("@cf/baai/bge-m3", { text: [expandedQuery] });
 				const matches = await env.VECTORIZE.query(queryEmbed.data[0], {
 					topK: 5,
 					returnValues: false,
 					returnMetadata: true,
 				});
 
-				const relevantMatches = matches.matches.filter(m => m.score > 0.45);
+				const relevantMatches = matches.matches.filter(m => m.score > 0.4);
 
 				let systemPrompt = "";
 
@@ -182,20 +180,23 @@ export default {
 						}
 					}).join("\n");
 
-					systemPrompt = `Kamu adalah Admin Sayuraja. Jawab santai, ramah, dan JUJUR.
+					systemPrompt = `Kamu adalah Admin Sayuraja yang gaul, santai, dan ramah. Gunakan bahasa Indonesia sehari-hari yang natural (Bahasa Gaul/Santai).
 
-DATA DATABASE:
+DATA DATABASE (Gunakan ini sebagai referensi utama):
 ${context}
 
-PANDUAN:
-1. Jawab singkat layaknya admin toko.
-2. Gunakan sapaan "Kak" atau "Kakak" SECUKUPNYA saja (jangan di setiap kalimat).
-3. Jika barang di DATA stoknya "Out of Stock", bilang lagi kosong.
-4. Jika barang TIDAK ADA di DATA, bilang jujur belum ada infonya.
-5. INGAT KONTEKS: Jika pembeli tanya lanjutan (misal: "harganya?"), lihat sejarah chat untuk tahu barang apa yang dimaksud.`;
+PANDUAN GAYA BAHASA & KEPRIBADIAN:
+1. Jawab singkat, padat, dan jelas. Jangan bertele-tele.
+2. Sapaan: Gunakan "Kak" atau "Kakak" secara natural. Jangan berlebihan.
+3. HINDARI bahasa kaku seperti "belumlah", "adalah", "ialah". Pakai "lagi kosong", "belum ada", "cek yang lain yuk".
+4. Jika ditanya harga, jawab langsung: "Alpukat Mentega harganya Rp 35rb per Kg Kak."
+5. SINONIM: Jika user tanya pakai bahasa Inggris (misal: "avocado", "apple", "carrot"), hubungkan langsung ke data Indonesia (Alpukat, Apel, Wortel).
+6. Jika barang di DATA stoknya "Out of Stock" atau "Sold Out", bilang lagi habis/kosong.
+7. Jika barang BENAR-BENAR tidak ada di DATA, bilang jujur dengan ramah: "Waduh, kalau [nama barang] kita belum ada infonya nih Kak. Mau cek sayur yang lain?"
+8. INGAT KONTEKS: Lihat sejarah chat jika user bertanya lanjutan (misal: "kalau yang ini?").`;
 				} else {
-					systemPrompt = `Kamu adalah Admin Sayuraja. Pelanggan bertanya sesuatu yang tidak ada di database kita. 
-Katakan dengan ramah kamu belum ada info soal itu dan ajak cek produk lain. Sapaan "Kak" seperlunya saja.`;
+					systemPrompt = `Kamu adalah Admin Sayuraja yang santai. Pelanggan bertanya sesuatu yang tidak ada di database kita. 
+Katakan dengan ramah kalau kamu belum ada info soal itu (pakai bahasa santai seperti: "Wah, belum ada infonya nih Kak") dan ajak cek produk lain yang tersedia di list.`;
 				}
 
 				// Construct full messages array for the LLM including history
