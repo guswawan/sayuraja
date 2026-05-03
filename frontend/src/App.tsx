@@ -130,9 +130,10 @@ function App() {
                     }`}
                   onClick={() => isReady && toggleItem(p.id)}
                 >
-                  {/* Media Section */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-200">
+                  {/* Media Section - Ratio 3:4, flush to top */}
+                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100">
                     {p.image && p.image.startsWith('http') ? (
+
                       p.mediaType === 'video' ? (
                         <video
                           src={p.image}
