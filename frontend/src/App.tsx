@@ -15,7 +15,8 @@ interface Product {
   stock: string;
 }
 
-const BACKEND_URL = 'https://sayuraja-backend.agsndoes6.workers.dev';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER;
 
 function App() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -63,7 +64,7 @@ function App() {
     const totalPrice = selectedProducts.reduce((sum, p) => sum + p.price, 0);
 
     const message = `Halo Sayuraja! Saya mau pesan belanjaan ini:\n\n${itemText}\n\nTotal Estimasi: Rp ${totalPrice.toLocaleString('id-ID')}\n\nMohon diproses ya Kak, terima kasih!`;
-    return `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
   };
 
   const handleAdminSync = async () => {

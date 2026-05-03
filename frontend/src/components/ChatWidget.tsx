@@ -37,7 +37,7 @@ export const ChatWidget: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://sayuraja-backend.agsndoes6.workers.dev/api/chat', {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -94,7 +94,7 @@ export const ChatWidget: React.FC = () => {
   const getWhatsAppLink = () => {
     const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
     const text = encodeURIComponent(`Halo Sayuraja! Saya mau tanya-tanya nih.\n\n${lastAssistantMsg}`);
-    return `https://wa.me/6281234567890?text=${text}`;
+    return `https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}?text=${text}`;
   };
 
   return (
