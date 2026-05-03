@@ -1,9 +1,9 @@
-# Sayuraya Database Setup Guide (Google Sheets)
+# Sayuraja Database Setup Guide (Google Sheets)
 
-To set up the database for the Sayuraya AI Concierge, follow these steps:
+To set up the database for the Sayuraja AI Concierge, follow these steps:
 
 ## 1. Create a New Google Sheet
-1. Create a new Google Sheet named `Sayuraya_Database`.
+1. Create a new Google Sheet named `Sayuraja_Database`.
 2. Note the **Spreadsheet ID** from the URL: `https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit`.
 
 ## 2. Set Up Sheet 1: `Product_Catalog`

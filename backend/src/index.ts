@@ -173,7 +173,7 @@ export default {
 						}
 					}).join("\n");
 
-					systemPrompt = `Kamu adalah Admin Sayuraya. Jawab santai, ramah, dan JUJUR.
+					systemPrompt = `Kamu adalah Admin Sayuraja. Jawab santai, ramah, dan JUJUR.
 
 DATA DATABASE:
 ${context}
@@ -185,7 +185,7 @@ PANDUAN:
 4. Jika barang TIDAK ADA di DATA, bilang jujur belum ada infonya.
 5. INGAT KONTEKS: Jika pembeli tanya lanjutan (misal: "harganya?"), lihat sejarah chat untuk tahu barang apa yang dimaksud.`;
 				} else {
-					systemPrompt = `Kamu adalah Admin Sayuraya. Pelanggan bertanya sesuatu yang tidak ada di database kita. 
+					systemPrompt = `Kamu adalah Admin Sayuraja. Pelanggan bertanya sesuatu yang tidak ada di database kita. 
 Katakan dengan ramah kamu belum ada info soal itu dan ajak cek produk lain. Sapaan "Kak" seperlunya saja.`;
 				}
 
@@ -215,7 +215,7 @@ Katakan dengan ramah kamu belum ada info soal itu dan ajak cek produk lain. Sapa
 				});
 			}
 		} else {
-			response = new Response("Sayuraya AI Concierge API");
+			response = new Response("Sayuraja AI Concierge API");
 		}
 
 		// Apply CORS to all responses
@@ -229,9 +229,5 @@ Katakan dengan ramah kamu belum ada info soal itu dan ajak cek produk lain. Sapa
 			statusText: response.statusText,
 			headers: newHeaders,
 		});
-	},
-
-	async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
-		ctx.waitUntil(syncData(env));
 	},
 };

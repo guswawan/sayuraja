@@ -1,9 +1,9 @@
 ***
 
-# Product Requirements Document (PRD): Sayuraya Automated Produce Concierge
+# Product Requirements Document (PRD): Sayuraja Automated Produce Concierge
 
 ## 1. Product Overview
-**Product Name:** Sayuraya AI Concierge  
+**Product Name:** Sayuraja AI Concierge  
 **Objective:** Automate and accelerate the customer service flow from discovery (Instagram) to conversion (WhatsApp) by implementing a Retrieval-Augmented Generation (RAG) system.  
 **Problem Addressed:** Eliminates the operational bottleneck where potential buyers ask for prices in Instagram comments, wait for DM replies, and administrators manually check stock availability.  
 
@@ -25,10 +25,10 @@ The infrastructure is heavily centralized around the Cloudflare ecosystem and mo
 
 ### Backend, Database, & AI (RAG Infrastructure)
 *   **Edge Compute:** Cloudflare Workers (handles API requests, prompt engineering, and LLM integration without cold-starts).
-*   **Vector Database:** Cloudflare Vectorize (stores embeddings of Sayuraya's catalog data).
+*   **Vector Database:** Cloudflare Vectorize (stores embeddings of Sayuraja's catalog data).
 *   **Cache/State (Optional):** Cloudflare KV (caches Google Sheets API responses to prevent rate-limiting).
 *   **LLM Engine:** Google Gemini API (accessed securely via Cloudflare Workers to hide API keys from the client).
-*   **Data Ingestion:** A Cron Trigger within Cloudflare Workers runs every 15-30 minutes for automated synchronization from the Google Sheets API to Cloudflare Vectorize.
+*   **Data Ingestion:** Data synchronization from the Google Sheets API to Cloudflare Vectorize is handled manually via the admin UI on the landing page.
 
 ## 4. Database Structure (Google Sheets)
 The system uses two main sheets as its knowledge base.
@@ -50,7 +50,7 @@ The system uses two main sheets as its knowledge base.
 | Delivery & Shipping Fee | Vegetable delivery is carried out every morning at 06:00 AM. Flat shipping fee of Rp 10,000 for a 5km radius. |
 
 ## 5. User Flow
-1.  **Entry Point:** The user clicks the link in Sayuraya's Instagram Bio.
+1.  **Entry Point:** The user clicks the link in Sayuraja's Instagram Bio.
 2.  **Discovery:** The landing page instantly loads a simple catalog interface and a floating chat widget ("Ask for a price or search for vegetables...").
 3.  **Interaction:** The user submits a query (e.g., "Is water spinach ready?").
 4.  **Edge Processing:** The request is intercepted by Cloudflare Workers -> Worker performs a vector similarity search in Cloudflare Vectorize -> Worker sends the *context* + *user query* to the Gemini API.
@@ -60,7 +60,7 @@ The system uses two main sheets as its knowledge base.
 ## 6. System Prompt & Guardrails
 
 **Core System Prompt:**
-> *"You are the official virtual assistant for 'Sayuraya', a fresh vegetable and fruit store. Your primary task is to serve customers politely, quickly, and in a friendly manner. Use the greeting 'Kak' (Indonesian for sibling/friendly term) for customers. Use casual but professional Indonesian typical of online shop administrators."*
+> *"You are the official virtual assistant for 'Sayuraja', a fresh vegetable and fruit store. Your primary task is to serve customers politely, quickly, and in a friendly manner. Use the greeting 'Kak' (Indonesian for sibling/friendly term) for customers. Use casual but professional Indonesian typical of online shop administrators."*
 
 **Strict Guardrails:**
 *   **Strict Grounding:** ONLY answer stock availability and pricing based on the provided database context. Guessing, estimating, or fabricating prices is strictly prohibited.

@@ -1,4 +1,4 @@
-# Sayuraya Development Workflow
+# Sayuraja Development Workflow
 
 To ensure stability, always test changes locally before deploying to production.
 
@@ -31,5 +31,5 @@ npx wrangler deploy
 ```bash
 cd frontend
 bun run build
-npx wrangler pages deploy dist --project-name sayuraya-frontend
+npx wrangler pages deploy dist --project-name sayuraja-frontend
 ```

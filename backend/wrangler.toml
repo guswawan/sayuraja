@@ -1,5 +1,5 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "sayuraya-backend"
+name = "sayuraja-backend"
 main = "src/index.ts"
 compatibility_date = "2026-05-02"
 
@@ -9,13 +9,10 @@ compatibility_date = "2026-05-02"
 
 [[vectorize]]
 binding = "VECTORIZE"
-index_name = "sayuraya_index"
+index_name = "sayuraja_index"
 
 [ai]
 binding = "AI"
 
 [observability]
 enabled = true
-
-[triggers]
-crons = ["*/30 * * * *"]

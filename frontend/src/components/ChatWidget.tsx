@@ -35,7 +35,7 @@ export const ChatWidget: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://sayuraya-backend.agsndoes6.workers.dev/api/chat', {
+      const response = await fetch('https://sayuraja-backend.agsndoes6.workers.dev/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -92,7 +92,7 @@ export const ChatWidget: React.FC = () => {
 
   const getWhatsAppLink = () => {
     const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
-    const text = encodeURIComponent(`Halo Sayuraya! Saya mau tanya-tanya nih.\n\n${lastAssistantMsg}`);
+    const text = encodeURIComponent(`Halo Sayuraja! Saya mau tanya-tanya nih.\n\n${lastAssistantMsg}`);
     return `https://wa.me/6281234567890?text=${text}`;
   };
 
@@ -112,7 +112,7 @@ export const ChatWidget: React.FC = () => {
           <CardHeader className="bg-green-600 text-white py-3 flex flex-row items-center justify-between shrink-0">
             <CardTitle className="text-lg flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
-              Sayuraya Concierge
+              Sayuraja Concierge
             </CardTitle>
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="text-white hover:bg-green-700">
               <X className="h-5 w-5" />

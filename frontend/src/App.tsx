@@ -13,7 +13,7 @@ interface Product {
   stock: string;
 }
 
-const BACKEND_URL = 'https://sayuraya-backend.agsndoes6.workers.dev';
+const BACKEND_URL = 'https://sayuraja-backend.agsndoes6.workers.dev';
 
 function App() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -67,7 +67,7 @@ function App() {
     <div className="min-h-screen bg-gray-50 pb-20">
       <header className="bg-green-600 text-white py-6 px-4 shadow-md">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold">Sayuraya</h1>
+          <h1 className="text-3xl font-bold">Sayuraja</h1>
           <p className="text-green-100">Segar Tiap Pagi, Langsung ke Rumah Kakak.</p>
         </div>
       </header>
@@ -114,7 +114,7 @@ function App() {
       <ChatWidget />
 
       <footer className="max-w-4xl mx-auto p-4 mt-12 border-t text-center text-gray-500 text-sm relative">
-        <p>&copy; 2026 Sayuraya Fresh. Delivery setiap jam 06:00 pagi.</p>
+        <p>&copy; 2026 Sayuraja Fresh. Delivery setiap jam 06:00 pagi.</p>
         
         {/* Discreet Admin Sync Button */}
         <div className="absolute right-4 bottom-4 flex items-center gap-2">
