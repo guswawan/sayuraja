@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChatWidget } from './components/ChatWidget'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Loader2, Settings, CheckCircle2, AlertCircle, ShoppingCart, Check, Plus } from 'lucide-react'
+import { Card } from "@/components/ui/card"
+import { Loader2, Settings, CheckCircle2, AlertCircle, Check, Plus } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
 interface Product {
