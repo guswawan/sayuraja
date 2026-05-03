@@ -23,8 +23,12 @@ async function getSheetValues(sheetId: string, range: string, apiKey: string): P
 
 async function syncData(env: Env) {
 	console.log("Starting sync...");
-	const sheetId = env.GOOGLE_SHEET_ID.trim();
-	const apiKey = env.GOOGLE_SHEETS_API_KEY.trim();
+	const sheetId = (env.GOOGLE_SHEET_ID || "").trim();
+	const apiKey = (env.GOOGLE_SHEETS_API_KEY || "").trim();
+
+	if (!sheetId || !apiKey) {
+		throw new Error("Missing GOOGLE_SHEET_ID or GOOGLE_SHEETS_API_KEY environment variables.");
+	}
 
 	// 1. Fetch Product Catalog
 	const productRows = await getSheetValues(sheetId, "Product_Catalog!A2:H100", apiKey);
@@ -110,8 +114,13 @@ export default {
 			}
 		} else if (url.pathname === "/api/products" && request.method === "GET") {
 			try {
-				const sheetId = env.GOOGLE_SHEET_ID.trim();
-				const apiKey = env.GOOGLE_SHEETS_API_KEY.trim();
+				const sheetId = (env.GOOGLE_SHEET_ID || "").trim();
+				const apiKey = (env.GOOGLE_SHEETS_API_KEY || "").trim();
+
+				if (!sheetId || !apiKey) {
+					throw new Error("Missing GOOGLE_SHEET_ID or GOOGLE_SHEETS_API_KEY environment variables.");
+				}
+
 				const productRows = await getSheetValues(sheetId, "Product_Catalog!A2:G100", apiKey);
 				
 				const products = productRows.map(row => ({
