@@ -13,7 +13,7 @@ interface Product {
   stock: string;
 }
 
-const BACKEND_URL = 'https://sayuraja-backend.agsndoes6.workers.dev';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 function App() {
   const [products, setProducts] = useState<Product[]>([]);
