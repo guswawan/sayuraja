@@ -38,16 +38,14 @@
 - **Data Source**: Google Sheets API.
 <!-- - **Hosting**: Cloudflare Pages. -->
 
----
-
-## 🛠️ Getting Started
+<!-- ## 🛠️ Getting Started
 
 ### Prerequisites
 - [Bun](https://bun.sh) runtime.
 - Cloudflare Account with Workers & Vectorize enabled.
 - Google Sheets API Credentials.
 
-<!-- ### Quick Setup
+### Quick Setup
 
 1. **Clone & Install**:
    ```bash
