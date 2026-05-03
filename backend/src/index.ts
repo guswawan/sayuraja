@@ -40,11 +40,9 @@ async function syncData(env: Env) {
 
 	// Process Products
 	for (const row of productRows) {
-		const [id, name, category, price, unit, stock, alias, contextCol] = row;
+		const [id, name, category, price, unit, image, mediaType, stock] = row;
 		
-		const context = (contextCol && contextCol !== "#ERROR!") 
-			? contextCol 
-			: `Produk: ${name}. Kategori: ${category}. Alias/Sinonim: ${alias || ""}. Harga: Rp ${price} per ${unit}. Stok: ${stock}. Deskripsi: Jual ${name} segar berkualitas untuk kebutuhan dapur Kakak.`;
+		const context = `Produk: ${name}. Kategori: ${category}. Harga: Rp ${price} per ${unit}. Stok: ${stock}. Deskripsi: Jual ${name} segar berkualitas.`;
 
 		const { data } = await env.AI.run("@cf/baai/bge-m3", {
 			text: [context],
@@ -53,7 +51,7 @@ async function syncData(env: Env) {
 		vectors.push({
 			id: `prod-${id}`,
 			values: data[0],
-			metadata: { type: "product", name, category, price, unit, stock, id },
+			metadata: { type: "product", name, category, price, unit, stock, id, image },
 		});
 	}
 
@@ -121,7 +119,7 @@ export default {
 					throw new Error("Missing GOOGLE_SHEET_ID or GOOGLE_SHEETS_API_KEY environment variables.");
 				}
 
-				const productRows = await getSheetValues(sheetId, "Product_Catalog!A2:G100", apiKey);
+				const productRows = await getSheetValues(sheetId, "Product_Catalog!A2:H100", apiKey);
 				
 				const products = productRows.map(row => ({
 					id: row[0],
@@ -129,7 +127,9 @@ export default {
 					category: row[2],
 					price: parseInt(row[3]) || 0,
 					unit: row[4],
-					stock: row[5],
+					image: row[5],
+					mediaType: row[6] || 'image',
+					stock: row[7],
 				}));
 
 				response = new Response(JSON.stringify({ success: true, products }), {
