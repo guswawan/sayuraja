@@ -95,7 +95,12 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto p-4 mt-8">
+      <main className="max-w-4xl mx-auto p-4 mt-4">
+        {/* Sticky Search/Chat Bar */}
+        <div className="sticky top-0 z-30 bg-gray-50/80 backdrop-blur-sm py-4 mb-4">
+          <ChatWidget />
+        </div>
+
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 text-green-600">
             <Loader2 className="h-10 w-10 animate-spin mb-4" />
@@ -180,8 +185,6 @@ function App() {
           </div>
         </div>
       )}
-
-      <ChatWidget />
 
       <footer className="max-w-4xl mx-auto p-4 mt-12 border-t text-center text-gray-500 text-sm relative">
         <p>&copy; 2026 Sayuraja Fresh. Delivery setiap jam 06:00 pagi.</p>

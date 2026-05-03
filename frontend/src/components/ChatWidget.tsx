@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, Send, X, MessageSquare } from 'lucide-react';
+import { X, MessageSquare, Search, Sparkles } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -29,6 +29,8 @@ export const ChatWidget: React.FC = () => {
     if (!input.trim() || isLoading) return;
 
     const userMsg = input.trim();
+    if (!isOpen) setIsOpen(true);
+    
     // Add user message and set loading
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setInput('');
@@ -46,7 +48,6 @@ export const ChatWidget: React.FC = () => {
 
       if (!response.ok) throw new Error('API Error');
 
-      // Add empty assistant message IMMEDIATELY to reduce perceived latency
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
       
       const reader = response.body?.getReader();
@@ -65,7 +66,6 @@ export const ChatWidget: React.FC = () => {
             if (line.startsWith('data: ')) {
               try {
                 const data = JSON.parse(line.slice(6));
-                // Handle different stream formats (Llama, Kimi, GLM)
                 const contentChunk = data.response || data.choices?.[0]?.delta?.content || '';
                 
                 if (contentChunk) {
@@ -76,9 +76,7 @@ export const ChatWidget: React.FC = () => {
                     return newMessages;
                   });
                 }
-              } catch (e) {
-                // Ignore parsing errors
-              }
+              } catch (e) {}
             }
           }
         }
@@ -97,42 +95,54 @@ export const ChatWidget: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      {!isOpen && (
-        <Button 
-          onClick={() => setIsOpen(true)} 
-          className="rounded-full h-14 w-14 shadow-lg bg-green-600 hover:bg-green-700"
-        >
-          <MessageCircle className="h-8 w-8 text-white" />
-        </Button>
-      )}
+    <div className="w-full max-w-4xl mx-auto mb-8">
+      {/* Search Input Bar */}
+      <div className="relative group">
+        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+          <Search className="h-5 w-5 text-gray-400 group-focus-within:text-green-600 transition-colors" />
+        </div>
+        <Input 
+          placeholder="Tanya stok, harga, atau tips masak ke AI Sayuraja..." 
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+          className="pl-12 pr-24 py-7 text-lg rounded-2xl border-2 border-green-100 focus-visible:ring-green-600 focus-visible:border-green-600 shadow-sm bg-white"
+          disabled={isLoading}
+        />
+        <div className="absolute inset-y-0 right-2 flex items-center gap-2">
+           <Button 
+            onClick={sendMessage} 
+            disabled={isLoading || !input.trim()} 
+            className="bg-green-600 hover:bg-green-700 rounded-xl px-4 flex items-center gap-2 h-10"
+          >
+            <Sparkles className="h-4 w-4" />
+            Tanya AI
+          </Button>
+        </div>
+      </div>
 
+      {/* Chat Results / Conversation Area */}
       {isOpen && (
-        <Card className="w-80 sm:w-96 h-[500px] flex flex-col shadow-2xl border-green-100 bg-white overflow-hidden">
-          <CardHeader className="bg-green-600 text-white py-3 flex flex-row items-center justify-between shrink-0">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
-              Sayuraja Concierge
+        <Card className="mt-4 shadow-xl border-green-100 bg-white overflow-hidden animate-in slide-in-from-top duration-300">
+          <CardHeader className="bg-green-50 text-green-800 py-3 flex flex-row items-center justify-between shrink-0 border-b border-green-100">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              AI Assistant Sayuraja
             </CardTitle>
-            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="text-white hover:bg-green-700">
-              <X className="h-5 w-5" />
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8 text-green-800 hover:bg-green-100">
+              <X className="h-4 w-4" />
             </Button>
           </CardHeader>
           
-          <CardContent className="flex-1 overflow-hidden p-0 bg-white">
-            <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
+          <CardContent className="p-0 bg-white">
+            <ScrollArea className="h-[300px] p-4" ref={scrollAreaRef}>
               <div className="space-y-4">
-                {messages.length === 0 && (
-                  <div className="text-center text-gray-500 mt-10">
-                    <p>Halo Kak! Ada yang bisa kami bantu seputar sayur dan buah hari ini?</p>
-                  </div>
-                )}
                 {messages.map((m, i) => (
                   <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[85%] rounded-2xl px-4 py-2 ${
                       m.role === 'user' 
                         ? 'bg-green-600 text-white rounded-tr-none' 
-                        : 'bg-gray-100 text-gray-900 rounded-tl-none shadow-sm'
+                        : 'bg-gray-100 text-gray-900 rounded-tl-none shadow-sm border border-gray-200'
                     }`}>
                       {m.content || (isLoading && i === messages.length - 1 ? (
                         <span className="flex gap-1 items-center py-1">
@@ -149,24 +159,12 @@ export const ChatWidget: React.FC = () => {
             </ScrollArea>
           </CardContent>
 
-          <CardFooter className="p-3 border-t flex flex-col gap-2 shrink-0 bg-white">
-            <div className="flex w-full gap-2">
-              <Input 
-                placeholder="Tanya harga bayam..." 
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                className="focus-visible:ring-green-600 rounded-xl"
-                disabled={isLoading}
-              />
-              <Button onClick={sendMessage} disabled={isLoading || !input.trim()} size="icon" className="bg-green-600 hover:bg-green-700 rounded-xl">
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+          <CardFooter className="p-3 border-t bg-gray-50 flex justify-between items-center">
+            <p className="text-[10px] text-gray-400 italic">AI bisa saja membuat kesalahan. Konfirmasi ulang pesanan Anda.</p>
             {messages.length > 0 && !isLoading && (
-              <Button className="w-full bg-green-500 hover:bg-green-600 p-0 rounded-xl shadow-sm">
-                <a href={getWhatsAppLink()} target="_blank" rel="noopener noreferrer" className="w-full h-full flex items-center justify-center">
-                  Order via WhatsApp
+              <Button variant="outline" size="sm" className="border-green-600 text-green-600 hover:bg-green-50 rounded-lg text-xs">
+                <a href={getWhatsAppLink()} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+                  Lanjut ke WhatsApp
                 </a>
               </Button>
             )}
