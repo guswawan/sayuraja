@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { ChatWidget } from './components/ChatWidget'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Loader2 } from 'lucide-react'
+import { Loader2, Settings, CheckCircle2, AlertCircle } from 'lucide-react'
 
 interface Product {
   id: string;
@@ -19,6 +19,8 @@ function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -39,6 +41,27 @@ function App() {
 
     fetchProducts();
   }, []);
+
+  const handleAdminSync = async () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    setSyncStatus('idle');
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/sync`, { method: 'POST' });
+      const data = await response.json();
+      if (data.success) {
+        setSyncStatus('success');
+        setTimeout(() => setSyncStatus('idle'), 3000);
+      } else {
+        setSyncStatus('error');
+      }
+    } catch (err) {
+      setSyncStatus('error');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -90,8 +113,21 @@ function App() {
 
       <ChatWidget />
 
-      <footer className="max-w-4xl mx-auto p-4 mt-12 border-t text-center text-gray-500 text-sm">
-        &copy; 2026 Sayuraya Fresh. Delivery setiap jam 06:00 pagi.
+      <footer className="max-w-4xl mx-auto p-4 mt-12 border-t text-center text-gray-500 text-sm relative">
+        <p>&copy; 2026 Sayuraya Fresh. Delivery setiap jam 06:00 pagi.</p>
+        
+        {/* Discreet Admin Sync Button */}
+        <div className="absolute right-4 bottom-4 flex items-center gap-2">
+          {syncStatus === 'success' && <span className="text-green-500 flex items-center gap-1 text-[10px]"><CheckCircle2 className="h-3 w-3" /> AI Updated</span>}
+          {syncStatus === 'error' && <span className="text-red-500 flex items-center gap-1 text-[10px]"><AlertCircle className="h-3 w-3" /> Sync Failed</span>}
+          <button 
+            onClick={handleAdminSync}
+            className={`text-gray-300 hover:text-green-600 transition-colors p-2 ${isSyncing ? 'animate-spin text-green-600' : ''}`}
+            title="Sync AI Memory (Admin Only)"
+          >
+            <Settings className="h-4 w-4" />
+          </button>
+        </div>
       </footer>
     </div>
   )
