@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { ChatWidget } from './components/ChatWidget'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Settings, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Loader2, Settings, CheckCircle2, AlertCircle, ShoppingCart, Check } from 'lucide-react'
+import { Button } from "@/components/ui/button"
 
 interface Product {
   id: string;
@@ -21,6 +22,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -41,6 +43,27 @@ function App() {
 
     fetchProducts();
   }, []);
+
+  const toggleItem = (productId: string) => {
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(productId)) {
+        newSet.delete(productId);
+      } else {
+        newSet.add(productId);
+      }
+      return newSet;
+    });
+  };
+
+  const getWhatsAppOrderLink = () => {
+    const selectedProducts = products.filter(p => selectedItems.has(p.id));
+    const itemText = selectedProducts.map(p => `- ${p.name} (Rp ${p.price.toLocaleString('id-ID')}/${p.unit})`).join('\n');
+    const totalPrice = selectedProducts.reduce((sum, p) => sum + p.price, 0);
+    
+    const message = `Halo Sayuraja! Saya mau pesan belanjaan ini:\n\n${itemText}\n\nTotal Estimasi: Rp ${totalPrice.toLocaleString('id-ID')}\n\nMohon diproses ya Kak, terima kasih!`;
+    return `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
+  };
 
   const handleAdminSync = async () => {
     if (isSyncing) return;
@@ -64,7 +87,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gray-50 pb-32">
       <header className="bg-green-600 text-white py-6 px-4 shadow-md">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold">Sayuraja</h1>
@@ -84,32 +107,79 @@ function App() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {products.map((p) => (
-              <Card key={p.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                <CardHeader className="bg-white pb-2">
-                  <div className="flex justify-between items-start">
-                    <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
-                      {p.category}
-                    </Badge>
-                    <Badge 
-                      variant={p.stock.toLowerCase() === 'in stock' || p.stock.toLowerCase() === 'ready' ? 'default' : 'destructive'} 
-                      className={p.stock.toLowerCase() === 'in stock' || p.stock.toLowerCase() === 'ready' ? 'bg-green-500' : ''}
-                    >
-                      {p.stock}
-                    </Badge>
-                  </div>
-                  <CardTitle className="mt-2">{p.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-green-700">
-                    Rp {p.price.toLocaleString('id-ID')} <span className="text-sm font-normal text-gray-500">/ {p.unit}</span>
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+            {products.map((p) => {
+              const isSelected = selectedItems.has(p.id);
+              const isReady = p.stock.toLowerCase() === 'in stock' || p.stock.toLowerCase() === 'ready';
+              
+              return (
+                <Card 
+                  key={p.id} 
+                  className={`overflow-hidden cursor-pointer transition-all border-2 ${
+                    isSelected ? 'border-green-500 bg-green-50 ring-2 ring-green-200 shadow-md' : 'border-transparent hover:shadow-md'
+                  }`}
+                  onClick={() => isReady && toggleItem(p.id)}
+                >
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex gap-2">
+                        <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
+                          {p.category}
+                        </Badge>
+                        {isSelected && (
+                          <Badge className="bg-green-600 text-white animate-in zoom-in-50 duration-200">
+                            <Check className="h-3 w-3 mr-1" /> Terpilih
+                          </Badge>
+                        )}
+                      </div>
+                      <Badge 
+                        variant={isReady ? 'default' : 'destructive'} 
+                        className={isReady ? 'bg-green-500' : ''}
+                      >
+                        {p.stock}
+                      </Badge>
+                    </div>
+                    <CardTitle className="mt-2 flex items-center justify-between">
+                      {p.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-between items-end">
+                      <p className="text-2xl font-bold text-green-700">
+                        Rp {p.price.toLocaleString('id-ID')} <span className="text-sm font-normal text-gray-500">/ {p.unit}</span>
+                      </p>
+                      <div className={`p-2 rounded-full transition-colors ${isSelected ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                        <ShoppingCart className="h-5 w-5" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </main>
+
+      {/* Floating Order Bar */}
+      {selectedItems.size > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-green-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-40 animate-in slide-in-from-bottom duration-300">
+          <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-sm text-gray-500">{selectedItems.size} item dipilih</p>
+              <p className="text-xl font-bold text-green-700">
+                Total: Rp {products
+                  .filter(p => selectedItems.has(p.id))
+                  .reduce((sum, p) => sum + p.price, 0)
+                  .toLocaleString('id-ID')}
+              </p>
+            </div>
+            <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-0 overflow-hidden rounded-2xl shadow-lg">
+              <a href={getWhatsAppOrderLink()} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full h-full px-8">
+                Pesan via WhatsApp
+              </a>
+            </Button>
+          </div>
+        </div>
+      )}
 
       <ChatWidget />
 
