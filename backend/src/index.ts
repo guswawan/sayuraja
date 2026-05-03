@@ -21,6 +21,16 @@ async function getSheetValues(sheetId: string, range: string, apiKey: string): P
 	return data.values || [];
 }
 
+function getMediaType(url: string | undefined): 'image' | 'video' {
+	if (!url) return 'image';
+	const videoExtensions = ['.mp4', '.mov', '.webm', '.ogg'];
+	const lowercaseUrl = url.toLowerCase();
+	if (videoExtensions.some(ext => lowercaseUrl.includes(ext)) || lowercaseUrl.includes('video')) {
+		return 'video';
+	}
+	return 'image';
+}
+
 async function syncData(env: Env) {
 	console.log("Starting sync...");
 	const sheetId = (env.GOOGLE_SHEET_ID || "").trim();
@@ -30,8 +40,8 @@ async function syncData(env: Env) {
 		throw new Error("Missing GOOGLE_SHEET_ID or GOOGLE_SHEETS_API_KEY environment variables.");
 	}
 
-	// 1. Fetch Product Catalog
-	const productRows = await getSheetValues(sheetId, "Product_Catalog!A2:H100", apiKey);
+	// 1. Fetch Product Catalog (7 columns: ID, Name, Category, Price, Unit, Image/Video, Stock)
+	const productRows = await getSheetValues(sheetId, "Product_Catalog!A2:G100", apiKey);
 	
 	// 2. Fetch Operational Knowledge Base
 	const opRows = await getSheetValues(sheetId, "Operational_Knowledge_Base!A2:B50", apiKey);
@@ -40,11 +50,9 @@ async function syncData(env: Env) {
 
 	// Process Products
 	for (const row of productRows) {
-		const [id, name, category, price, unit, stock, alias, contextCol] = row;
+		const [id, name, category, price, unit, image, stock] = row;
 		
-		const context = (contextCol && contextCol !== "#ERROR!") 
-			? contextCol 
-			: `Produk: ${name}. Kategori: ${category}. Alias/Sinonim: ${alias || ""}. Harga: Rp ${price} per ${unit}. Stok: ${stock}. Deskripsi: Jual ${name} segar berkualitas untuk kebutuhan dapur Kakak.`;
+		const context = `Produk: ${name}. Kategori: ${category}. Harga: Rp ${price} per ${unit}. Stok: ${stock}. Deskripsi: Jual ${name} segar berkualitas.`;
 
 		const { data } = await env.AI.run("@cf/baai/bge-m3", {
 			text: [context],
@@ -53,7 +61,17 @@ async function syncData(env: Env) {
 		vectors.push({
 			id: `prod-${id}`,
 			values: data[0],
-			metadata: { type: "product", name, category, price, unit, stock, id },
+			metadata: { 
+				type: "product", 
+				name, 
+				category, 
+				price, 
+				unit, 
+				stock, 
+				id, 
+				image,
+				mediaType: getMediaType(image)
+			},
 		});
 	}
 
@@ -123,14 +141,19 @@ export default {
 
 				const productRows = await getSheetValues(sheetId, "Product_Catalog!A2:G100", apiKey);
 				
-				const products = productRows.map(row => ({
-					id: row[0],
-					name: row[1],
-					category: row[2],
-					price: parseInt(row[3]) || 0,
-					unit: row[4],
-					stock: row[5],
-				}));
+				const products = productRows.map(row => {
+					const imageLink = row[5];
+					return {
+						id: row[0],
+						name: row[1],
+						category: row[2],
+						price: parseInt(row[3]) || 0,
+						unit: row[4],
+						image: imageLink,
+						mediaType: getMediaType(imageLink),
+						stock: row[6],
+					};
+				});
 
 				response = new Response(JSON.stringify({ success: true, products }), {
 					headers: { "Content-Type": "application/json" },
