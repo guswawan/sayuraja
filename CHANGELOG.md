@@ -4,11 +4,21 @@ Semua perubahan signifikan pada proyek **Sayuraja** akan didokumentasikan di fil
 
 ## [1.1.0] - 2026-05-03
 
+### Visual Highlights
+| Feature | Before (v1.0.0) | After (v1.1.0) |
+| :--- | :--- | :--- |
+| **Search & AI** | 🟢 Floating Bubble | 🔍 Sticky Search Bar |
+| **Selection** | 📄 Read-only List | 🛒 Multi-item Select |
+| **Checkout** | 💬 Manual Chat | 📱 WhatsApp Pre-filled |
+
 ### Added
 - **Multi-Item Selection**: Fitur untuk memilih beberapa produk sekaligus dengan indikator visual "Terpilih".
+  > ![Multi-select Placeholder](docs/screenshots/multi-select.png)
 - **Floating Order Bar**: Bar dinamis di bagian bawah layar yang menampilkan jumlah item dan total estimasi harga secara real-time.
+  > ![Order Bar Placeholder](docs/screenshots/order-bar.png)
 - **WhatsApp Pre-filled Message**: Otomatisasi pesan WhatsApp yang berisi daftar belanjaan detail (nama produk, harga, unit) dan total harga.
 - **Sticky AI Search Bar**: Re-layout Chat Widget menjadi kolom pencarian yang menempel di atas daftar produk.
+  > ![Sticky Search Placeholder](docs/screenshots/sticky-search.png)
 - **Search-to-Chat Transition**: Panel AI Assistant yang melebar (expand) saat pengguna berinteraksi dengan bar pencarian.
 
 ### Changed
