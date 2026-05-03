@@ -1,13 +1,15 @@
 # Sayuraja 🥬
 ### Automated Produce Concierge: From Discovery to Conversion with AI
 
+<img width="616" height="273" alt="image" src="https://github.com/user-attachments/assets/029d29a8-5e5b-4914-a6b9-cab350544d0e" />
+
 **Sayuraja** is an AI-powered retail assistant designed to eliminate the operational bottleneck between social media engagement (Instagram/TikTok/Facebook) and final sales conversion (WhatsApp). By leveraging Retrieval-Augmented Generation (RAG) at the edge, Sayuraja provides instant, accurate, and friendly responses to customer inquiries about price and stock, 24/7.
 
 ---
 
 ## ✨ The Problem vs. The Solution
 
-| The Old Way 🐢 | The Sayuraja Way ⚡ |
+| The Old Way 🐢 | The New Way ⚡ |
 | :--- | :--- |
 | Customer asks price in IG comments. | Customer clicks bio link, enters AI storefront. |
 | Admin manually checks Product Catalog price & stock. | AI instantly queries Vector Database at the edge. |
