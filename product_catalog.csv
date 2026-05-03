@@ -1,8 +1,8 @@
-Product_ID,Product_Name,Category,Price_Number,Unit,Stock_Status,Search_Alias
-SYR-001,Bayam Hijau,Sayuran Daun,5000,Ikat,In Stock,"Bayem, sayur hijau"
-SYR-002,Tomat Merah,Sayuran Buah,15000,Kg,Out of Stock,Tomat sayur, tomat medan
-SYR-003,Wortel Lokal,Umbi-umbian,12000,Kg,In Stock,Wortel sop, carrot
-SYR-004,Kangkung Cabut,Sayuran Daun,4000,Ikat,In Stock,Kangkung akar
-SYR-005,Cabai Rawit Merah,Bumbu Dapur,65000,Kg,In Stock,"Cabe setan, cabe pedas"
-SYR-006,Telur Ayam Negeri,Protein,28000,Kg,In Stock,Telor ayam
-SYR-007,Jeruk Peras,Buah,18000,Kg,Out of Stock,Jeruk manis
+Product_ID,Product_Name,Category,Price_Number,Unit,Image_Link,Stock_Status
+SYR-001,Bayam Hijau,Sayuran Daun,5000,Ikat,https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&q=80&w=800,In Stock
+SYR-002,Tomat Merah,Sayuran Buah,15000,Kg,https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80&w=800,Out of Stock
+SYR-003,Wortel Lokal,Umbi-umbian,12000,Kg,https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&q=80&w=800,In Stock
+SYR-004,Kangkung Cabut,Sayuran Daun,4000,Ikat,https://images.unsplash.com/photo-1628543302703-9ef7503b55ed?auto=format&fit=crop&q=80&w=800,In Stock
+SYR-005,Cabai Rawit Merah,Bumbu Dapur,65000,Kg,https://images.unsplash.com/photo-1601648764658-cf37e8c89b70?auto=format&fit=crop&q=80&w=800,In Stock
+SYR-006,Telur Ayam Negeri,Protein,28000,Kg,https://images.unsplash.com/photo-1582722134903-b129900290c0?auto=format&fit=crop&q=80&w=800,In Stock
+SYR-007,Jeruk Peras,Buah,18000,Kg,https://images.unsplash.com/photo-1611080626919-7cf5a969fc03?auto=format&fit=crop&q=80&w=800,Out of Stock
