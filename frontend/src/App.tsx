@@ -88,7 +88,7 @@ function App() {
   };
 
   const getPlaceholderImage = (name: string) => {
-    return `https://placehold.co/600x400/f3f4f6/16a34a?text=${encodeURIComponent(name)}`;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=f0fdf4&color=16a34a&size=512`;
   };
 
   return (
@@ -119,7 +119,9 @@ function App() {
           <div className="grid grid-cols-2 gap-3 sm:gap-6">
             {products.map((p) => {
               const isSelected = selectedItems.has(p.id);
-              const isReady = p.stock.toLowerCase() === 'in stock' || p.stock.toLowerCase() === 'ready';
+              const isReady = p.stock?.toLowerCase() === 'in stock' || p.stock?.toLowerCase() === 'ready';
+              
+              // Debug: console.log(`Rendering product ${p.name}: ${p.image}`);
 
               return (
                 <Card
@@ -129,8 +131,8 @@ function App() {
                   onClick={() => isReady && toggleItem(p.id)}
                 >
                   {/* Media Section */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
-                    {p.image ? (
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-200">
+                    {p.image && p.image.startsWith('http') ? (
                       p.mediaType === 'video' ? (
                         <video
                           src={p.image}
@@ -144,8 +146,10 @@ function App() {
                         <img
                           src={p.image}
                           alt={p.name}
+                          loading="lazy"
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
+                            console.error(`Failed to load image for ${p.name}: ${p.image}`);
                             (e.target as HTMLImageElement).src = getPlaceholderImage(p.name);
                           }}
                         />
