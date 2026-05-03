@@ -116,22 +116,22 @@ function App() {
             {error}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {products.map((p) => {
               const isSelected = selectedItems.has(p.id);
               const isReady = p.stock?.toLowerCase() === 'in stock' || p.stock?.toLowerCase() === 'ready';
-              
+
               // Debug: console.log(`Rendering product ${p.name}: ${p.image}`);
 
               return (
                 <Card
                   key={p.id}
-                  className={`group relative flex flex-col overflow-hidden cursor-pointer transition-all border-none shadow-sm hover:shadow-md bg-white rounded-2xl ${isSelected ? 'ring-2 ring-green-500 ring-offset-2' : ''
+                  className={`group relative flex flex-col overflow-hidden cursor-pointer transition-all border-none shadow-sm hover:shadow-md bg-white rounded-2xl pt-0 ${isSelected ? 'ring-2 ring-green-500 ring-offset-2' : ''
                     }`}
                   onClick={() => isReady && toggleItem(p.id)}
                 >
-                  {/* Media Section - Ratio 3:4, flush to top */}
-                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100">
+                  {/* Media Section - Ratio 4:5, flush to top */}
+                  <div className="relative aspect-[4/5] w-full overflow-hidden bg-gray-100">
                     {p.image && p.image.startsWith('http') ? (
 
                       p.mediaType === 'video' ? (
@@ -163,6 +163,14 @@ function App() {
                       />
                     )}
 
+                    {/* Promo Badge - Similar to reference */}
+                    {/* {p.price < 20000 && (
+                      <div className="absolute bottom-0 left-0 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-tr-xl flex items-center gap-1 z-10">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                        PROMO
+                      </div>
+                    )} */}
+
                     {/* Selected Overlay */}
                     {isSelected && (
                       <div className="absolute inset-0 bg-green-600/10 backdrop-blur-[1px] flex items-center justify-center">
@@ -174,22 +182,22 @@ function App() {
                   </div>
 
                   {/* Content Section */}
-                  <div className="flex-1 p-3 sm:p-4 flex flex-col gap-1">
-                    <h3 className="font-bold text-gray-900 text-sm sm:text-base line-clamp-1 leading-tight">
+                  <div className="flex-1 px-2.5 py-0 sm:px-3 sm:py-0 flex flex-col gap-0.5">
+                    <h3 className="font-bold text-gray-900 text-sm leading-tight">
                       {p.name}
                     </h3>
-                    <p className="text-[11px] sm:text-xs text-gray-400 font-medium">
+                    <p className="text-xs text-gray-400 font-medium">
                       per {p.unit || 'pack'}
                     </p>
 
-                    <div className="mt-auto pt-2 flex flex-col">
-                      <span className="text-orange-600 font-extrabold text-sm sm:text-lg leading-none">
+                    <div className="mt-auto flex flex-col">
+                      <span className="text-green-600 font-extrabold text-lg leading-none">
                         Rp {p.price.toLocaleString('id-ID')}
                       </span>
                     </div>
 
                     {/* Add Button */}
-                    <div className="absolute bottom-3 right-3">
+                    <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3">
                       <div
                         className={`p-1.5 sm:p-2 rounded-full shadow-sm transition-all active:scale-90 ${isSelected ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-400 group-hover:bg-green-600 group-hover:text-white'
                           }`}
@@ -215,7 +223,7 @@ function App() {
 
       {/* Floating Order Bar */}
       {selectedItems.size > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-green-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-40 animate-in slide-in-from-bottom duration-300">
+        <div className="fixed bottom-0 left-0 right-0 p-4 lg:py-12 bg-white/80 backdrop-blur-md border-t border-green-100 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-40 animate-in slide-in-from-bottom duration-300">
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
             <div className="flex-1">
               <p className="text-sm text-gray-500">{selectedItems.size} item dipilih</p>
@@ -226,7 +234,7 @@ function App() {
                   .toLocaleString('id-ID')}
               </p>
             </div>
-            <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-0 overflow-hidden rounded-2xl shadow-lg">
+            <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-0 overflow-hidden rounded-2xl">
               <a href={getWhatsAppOrderLink()} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full h-full px-8">
                 Pesan via WhatsApp
               </a>

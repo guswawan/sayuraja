@@ -1,8 +1,16 @@
 Product_ID,Product_Name,Category,Price_Number,Unit,Image_Link,Stock_Status
-SYR-001,Bayam Hijau,Sayuran Daun,5000,Ikat,https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&q=80&w=800,In Stock
-SYR-002,Tomat Merah,Sayuran Buah,15000,Kg,https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80&w=800,Out of Stock
-SYR-003,Wortel Lokal,Umbi-umbian,12000,Kg,https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&q=80&w=800,In Stock
-SYR-004,Kangkung Cabut,Sayuran Daun,4000,Ikat,https://images.unsplash.com/photo-1628543302703-9ef7503b55ed?auto=format&fit=crop&q=80&w=800,In Stock
-SYR-005,Cabai Rawit Merah,Bumbu Dapur,65000,Kg,https://images.unsplash.com/photo-1601648764658-cf37e8c89b70?auto=format&fit=crop&q=80&w=800,In Stock
-SYR-006,Telur Ayam Negeri,Protein,28000,Kg,https://images.unsplash.com/photo-1582722134903-b129900290c0?auto=format&fit=crop&q=80&w=800,In Stock
-SYR-007,Jeruk Peras,Buah,18000,Kg,https://images.unsplash.com/photo-1611080626919-7cf5a969fc03?auto=format&fit=crop&q=80&w=800,Out of Stock
+SYR-001,Bayam Hijau,Sayuran Daun,5000,Ikat,https://images.segari.id/v1/products/bayam-hijau-1.webp,In Stock
+SYR-002,Tomat Merah,Sayuran Buah,15000,Kg,https://images.segari.id/v1/products/tomat-merah-1.webp,Out of Stock
+SYR-003,Wortel Lokal,Umbi-umbian,12000,Kg,https://images.segari.id/v1/products/wortel-lokal-1.webp,In Stock
+SYR-004,Kangkung Cabut,Sayuran Daun,4000,Ikat,https://images.segari.id/v1/products/kangkung-cabut-1.webp,In Stock
+SYR-005,Cabai Rawit Merah,Bumbu Dapur,65000,Kg,https://images.segari.id/v1/products/cabai-rawit-merah-1.webp,In Stock
+SYR-006,Telur Ayam Negeri,Protein,28000,Kg,https://images.segari.id/v1/products/telur-ayam-negeri-1.webp,In Stock
+SYR-007,Jeruk Peras,Buah,18000,Kg,https://images.segari.id/v1/products/jeruk-peras-1.webp,Out of Stock
+SYR-008,Brokoli,Sayuran Daun,25000,Kg,https://images.segari.id/v1/products/brokoli-1.webp,In Stock
+SYR-009,Bawang Merah,Bumbu Dapur,35000,Kg,https://images.segari.id/v1/products/bawang-merah-1.webp,In Stock
+SYR-010,Apel Fuji,Buah,45000,Kg,https://images.segari.id/v1/products/apel-fuji-1.webp,In Stock
+SYR-011,Pisang Cavendish,Buah,22000,Kg,https://images.segari.id/v1/products/pisang-cavendish-1.webp,In Stock
+SYR-012,Labu Siam,Sayuran Buah,8000,Kg,https://images.segari.id/v1/products/labu-siam-1.webp,In Stock
+SYR-013,Terong Ungu,Sayuran Buah,12000,Kg,https://images.segari.id/v1/products/terong-ungu-1.webp,In Stock
+SYR-014,Alpukat Mentega,Buah,35000,Kg,https://images.segari.id/v1/products/alpukat-mentega-1.webp,In Stock
+SYR-015,Strawberry,Buah,40000,Kg,https://images.segari.id/v1/products/strawberry-1.webp,In Stock
