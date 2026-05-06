@@ -21,10 +21,13 @@ async function getSheetValues(sheetId: string, range: string, apiKey: string): P
 	return data.values || [];
 }
 
-function getMediaType(url: string | undefined): 'image' | 'video' {
+function getMediaType(url: string | undefined): 'image' | 'video' | 'instagram' {
 	if (!url) return 'image';
-	const videoExtensions = ['.mp4', '.mov', '.webm', '.ogg'];
 	const lowercaseUrl = url.toLowerCase();
+	if (lowercaseUrl.includes('instagram.com/reel/') || lowercaseUrl.includes('instagram.com/reels/')) {
+		return 'instagram';
+	}
+	const videoExtensions = ['.mp4', '.mov', '.webm', '.ogg'];
 	if (videoExtensions.some(ext => lowercaseUrl.includes(ext)) || lowercaseUrl.includes('video')) {
 		return 'video';
 	}

@@ -11,7 +11,7 @@ interface Product {
   price: number;
   unit: string;
   image?: string;
-  mediaType?: 'image' | 'video';
+  mediaType?: 'image' | 'video' | 'instagram';
   stock: string;
 }
 
@@ -134,8 +134,16 @@ function App() {
                   {/* Media Section - Ratio 4:5, flush to top */}
                   <div className="relative aspect-[4/5] w-full overflow-hidden bg-gray-100">
                     {p.image && p.image.startsWith('http') ? (
-
-                      p.mediaType === 'video' ? (
+                      p.mediaType === 'instagram' ? (
+                        <iframe
+                          src={`${p.image}${p.image.endsWith('/') ? '' : '/'}embed/`}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          frameBorder="0"
+                          scrolling="no"
+                          allowTransparency={true}
+                          allow="encrypted-media"
+                        />
+                      ) : p.mediaType === 'video' ? (
                         <video
                           src={p.image}
                           autoPlay

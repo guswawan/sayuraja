@@ -22,9 +22,15 @@
 
 - **🤖 RAG-Powered AI Chat**: Uses high-performance LLMs grounded in your actual stock data to prevent hallucinations.
 - **⚡ Edge-First Architecture**: Built on Cloudflare Workers for near-zero latency and instant global delivery.
-- **📊 Google Sheets as Headless CMS**: Non-technical staff can update prices, stock, product data in a simple spreadsheet.
+- **📊 Google Sheets as Headless CMS**: Non-technical staff can update prices, stock, product data, and even use **Instagram Reels** as product media directly in a simple spreadsheet.
 - **📱 Built for In-App Browsers**: Optimized for the Instagram/TikTok/Facebook built-in browsers with a lightweight, mobile-first React interface.
 - **🛒 Smart Conversion**: Automatically formats customer orders into a single clear WhatsApp message.
+
+### 📽️ Media Support
+Sayuraja supports various media formats for the `Image_link` column in your Google Sheets:
+- **Images**: Direct links to JPG, PNG, WEBP, etc.
+- **Direct Video**: Direct links to MP4, MOV, WebM.
+- **Instagram Reels**: Link to an Instagram Reel (e.g., `https://www.instagram.com/reel/XXXX/`). These will be embedded automatically.
 
 ---
 
