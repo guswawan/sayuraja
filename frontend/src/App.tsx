@@ -135,14 +135,15 @@ function App() {
                   <div className="relative aspect-[4/5] w-full overflow-hidden bg-gray-100">
                     {p.image && p.image.startsWith('http') ? (
                       p.mediaType === 'instagram' ? (
-                        <iframe
-                          src={`${p.image}${p.image.endsWith('/') ? '' : '/'}embed/`}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          frameBorder="0"
-                          scrolling="no"
-                          allowTransparency={true}
-                          allow="encrypted-media"
-                        />
+                        <div className="h-full w-full overflow-hidden relative bg-gray-900">
+                          <iframe
+                            src={`${p.image}${p.image.endsWith('/') ? '' : '/'}embed/?autoplay=1`}
+                            className="absolute top-1/2 left-1/2 w-[115%] h-[160%] -translate-x-1/2 -translate-y-1/2 border-none"
+                            scrolling="no"
+                            allowTransparency={true}
+                            allow="autoplay; encrypted-media"
+                          />
+                        </div>
                       ) : p.mediaType === 'video' ? (
                         <video
                           src={p.image}

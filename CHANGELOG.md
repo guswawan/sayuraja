@@ -5,7 +5,7 @@ Semua perubahan signifikan pada proyek **Sayuraja** akan didokumentasikan di fil
 ## [1.1.1] - 2026-05-06
 
 ### Added
-- **Instagram Reels Support**: Sekarang kolom `Image_link` di Google Sheets bisa menggunakan link Instagram Reels (format `/reel/` atau `/reels/`). Sistem akan otomatis mendeteksi dan menampilkan video reels secara embedded di katalog produk.
+- **Instagram Reels Support**: Sekarang kolom `Image_link` di Google Sheets bisa menggunakan link Instagram Reels (format `/reel/` atau `/reels/`). Sistem akan otomatis menampilkan video reels dengan tampilan "Clean" (hanya video) dan mencoba untuk autoplay.
 
 ## [1.1.0] - 2026-05-03
 ...
