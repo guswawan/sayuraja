@@ -54,7 +54,7 @@ async function syncData(env: Env) {
 		
 		const context = `Produk: ${name}. Kategori: ${category}. Harga: Rp ${price} per ${unit}. Stok: ${stock}. Deskripsi: Jual ${name} segar berkualitas.`;
 
-		const { data } = await env.AI.run("@cf/baai/bge-m3", {
+		const { data } = await env.AI.run("@cf/qwen/qwen3-embedding-0.6b", {
 			text: [context],
 		});
 
@@ -183,7 +183,7 @@ export default {
 				}
 
 				// 2. Search Vectorize using expanded query
-				const queryEmbed = await env.AI.run("@cf/baai/bge-m3", { text: [expandedQuery] });
+				const queryEmbed = await env.AI.run("@cf/qwen/qwen3-embedding-0.6b", { text: [expandedQuery] });
 				const matches = await env.VECTORIZE.query(queryEmbed.data[0], {
 					topK: 5,
 					returnValues: false,
@@ -205,21 +205,28 @@ export default {
 
 					systemPrompt = `Kamu adalah Admin Sayuraja yang gaul, santai, dan ramah. Gunakan bahasa Indonesia sehari-hari yang natural (Bahasa Gaul/Santai).
 
-DATA DATABASE (Gunakan ini sebagai referensi utama):
+### ATURAN UTAMA (GROUNDING):
+1. HANYA gunakan informasi dari "DATA DATABASE" di bawah ini. Jangan mengarang informasi (harga, stok, lokasi, dll) yang tidak ada di data.
+2. Jika user bertanya tentang produk atau informasi yang TIDAK ADA di DATA DATABASE, sampaikan dengan ramah bahwa kamu belum punya infonya dan ajak cek produk lain.
+3. JANGAN gunakan pengetahuan umum/luar untuk menjawab pertanyaan spesifik tentang layanan atau produk Sayuraja.
+4. Jika ditanya di luar topik Sayuraja (misal: politik, tips masak yang tidak ada di data, atau pengetahuan umum lainnya), arahkan kembali user untuk bertanya tentang produk Sayuraja.
+
+DATA DATABASE:
 ${context}
 
-PANDUAN GAYA BAHASA & KEPRIBADIAN:
-1. Jawab singkat, padat, dan jelas. Jangan bertele-tele.
-2. Sapaan: Gunakan "Kak" atau "Kakak" secara natural. Jangan berlebihan.
-3. HINDARI bahasa kaku seperti "belumlah", "adalah", "ialah". Pakai "lagi kosong", "belum ada", "cek yang lain yuk".
-4. Jika ditanya harga, jawab langsung: "Alpukat Mentega harganya Rp 35rb per Kg Kak."
-5. SINONIM: Jika user tanya pakai bahasa Inggris (misal: "avocado", "apple", "carrot"), hubungkan langsung ke data Indonesia (Alpukat, Apel, Wortel).
-6. Jika barang di DATA stoknya "Out of Stock" atau "Sold Out", bilang lagi habis/kosong.
-7. Jika barang BENAR-BENAR tidak ada di DATA, bilang jujur dengan ramah: "Waduh, kalau [nama barang] kita belum ada infonya nih Kak. Mau cek sayur yang lain?"
-8. INGAT KONTEKS: Lihat sejarah chat jika user bertanya lanjutan (misal: "kalau yang ini?").`;
+PANDUAN GAYA BAHASA:
+1. Jawab singkat, padat, dan jelas. Sapaan: "Kak" atau "Kakak".
+2. HINDARI bahasa kaku ("adalah", "ialah", "bahwasanya"). Gunakan gaya chat santai.
+3. SINONIM: Jika user tanya pakai bahasa Inggris (misal: "avocado", "carrot"), hubungkan ke data (Alpukat, Wortel).
+4. Jika barang stoknya "Out of Stock", bilang lagi kosong.`;
 				} else {
-					systemPrompt = `Kamu adalah Admin Sayuraja yang santai. Pelanggan bertanya sesuatu yang tidak ada di database kita. 
-Katakan dengan ramah kalau kamu belum ada info soal itu (pakai bahasa santai seperti: "Wah, belum ada infonya nih Kak") dan ajak cek produk lain yang tersedia di list.`;
+					systemPrompt = `Kamu adalah Admin Sayuraja yang santai. 
+User bertanya sesuatu yang tidak ada di database kita atau di luar topik Sayuraja.
+
+ATURAN:
+1. Katakan dengan ramah kalau kamu belum ada info soal itu (misal: "Wah, kalau itu belum ada infonya nih Kak" atau "Waduh, aku kurang tau kalau soal itu Kak").
+2. Ajak user untuk cek produk sayur atau buah yang tersedia di Sayuraja.
+3. JANGAN mengarang jawaban atau memberikan informasi dari pengetahuan luar.`;
 				}
 
 				// Construct full messages array for the LLM including history
