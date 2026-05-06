@@ -2,6 +2,15 @@
 
 Semua perubahan signifikan pada proyek **Sayuraja** akan didokumentasikan di file ini.
 
+## [1.2.0] - 2026-05-06
+
+### Added
+- **AI Safeguards & Anti-Hallucination**: Implementasi aturan grounding yang ketat agar AI hanya menjawab berdasarkan basis pengetahuan (Google Sheets) dan menolak pertanyaan di luar topik.
+- **Qwen3 Embedding Model**: Migrasi model embedding dari `bge-m3` ke `@cf/qwen/qwen3-embedding-0.6b` untuk akurasi pencarian semantik yang lebih tinggi dan dukungan konteks yang lebih luas (32k tokens).
+
+### Changed
+- **System Prompt Refinement**: Pengoptimalan instruksi sistem untuk menjaga kepribadian "Admin Sayuraja" tetap ramah namun profesional dalam batasan informasi yang tersedia.
+
 ## [1.1.0] - 2026-05-03
 
 ### Visual Highlights
