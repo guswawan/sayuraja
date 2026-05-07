@@ -2,6 +2,14 @@
 
 Semua perubahan signifikan pada proyek **Sayuraja** akan didokumentasikan di file ini.
 
+## [1.3.0] - 2026-05-07
+
+### Added
+- **E2E Testing with Playwright**: Implementasi pengujian end-to-end otomatis untuk menjamin stabilitas fitur utama.
+- **Automated Test Scenarios**: Pengujian untuk alur pemilihan produk, kalkulasi harga di order bar, dan interaksi Chat Widget.
+- **API Mocking**: Setup infrastruktur mocking API untuk pengujian yang lebih cepat dan terisolasi tanpa ketergantungan pada backend live.
+- **Test Scripts**: Penambahan perintah `test:e2e` dan `test:e2e:ui` di package manager untuk kemudahan pengembangan.
+
 ## [1.2.0] - 2026-05-06
 
 ### Added
