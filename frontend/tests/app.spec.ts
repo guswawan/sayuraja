@@ -44,8 +44,7 @@ test.describe('Sayuraja App', () => {
     await page.getByText('Kangkung Segar').click();
 
     // Check if the floating order bar appears
-    const orderBar = page.locator('div').filter({ hasText: /1 item dipilih/ });
-    await expect(orderBar).toBeVisible();
+    await expect(page.getByText('1 item dipilih')).toBeVisible();
 
     // Check if the price is correct (Rp 5.000)
     await expect(page.getByText('Total: Rp 5.000')).toBeVisible();
