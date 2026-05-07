@@ -1,0 +1,70 @@
+name: Automated Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'CHANGELOG.md'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest version and notes
+        id: changelog_reader
+        run: |
+          # Extract version from the first line starting with ## [
+          VERSION=$(grep -m 1 "## \[" CHANGELOG.md | sed -E 's/## \[(.*)\].*/\1/')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+          # Extract release notes for this version
+          # It takes everything between the current version header and the next header
+          NOTES=$(sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '1d;$d' | sed '/^$/d' | sed 's/"/\\"/g')
+          
+          # Use a heredoc for multi-line output
+          echo "NOTES<<EOF" >> $GITHUB_OUTPUT
+          sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '1d;$d' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Update package.json files
+        run: |
+          # Update frontend
+          if [ -f "frontend/package.json" ]; then
+            sed -i "s/\"version\": \".*\"/\"version\": \"${{ steps.changelog_reader.outputs.VERSION }}\"/" frontend/package.json
+          fi
+          
+          # Update backend
+          if [ -f "backend/package.json" ]; then
+            sed -i "s/\"version\": \".*\"/\"version\": \"${{ steps.changelog_reader.outputs.VERSION }}\"/" backend/package.json
+          fi
+
+      - name: Commit version updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add frontend/package.json backend/package.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: bump version to ${{ steps.changelog_reader.outputs.VERSION }}"
+          git push origin main
+
+      - name: Create Tag
+        run: |
+          git tag v${{ steps.changelog_reader.outputs.VERSION }}
+          git push origin v${{ steps.changelog_reader.outputs.VERSION }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.changelog_reader.outputs.VERSION }}
+          name: Release v${{ steps.changelog_reader.outputs.VERSION }}
+          body: ${{ steps.changelog_reader.outputs.NOTES }}
+          draft: false
+          prerelease: false
