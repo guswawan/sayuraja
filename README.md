@@ -81,12 +81,12 @@
 
 ---
 
-## 📈 Success Metrics
+<!-- ## 📈 Success Metrics
 - **60% Reduction** in repetitive DM inquiries.
 - **P95 Latency < 2s** for AI responses.
 - **Zero Hallucination** stock reporting through RAG grounding.
 
----
+--- -->
 
 <!-- ## 🗺️ Roadmap
 - [ ] **Multi-Admin Support**: Handle multiple branch locations.
