@@ -88,6 +88,15 @@ function App() {
     }
   };
 
+  const resolveGoogleDriveUrl = (url: string | undefined): string | undefined => {
+    if (!url) return url;
+    const match = url.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=download&)?id=|uc\?id=)|docs\.google\.com\/file\/d\/)([a-zA-Z0-9_-]{25,50})/);
+    if (match && match[1]) {
+      return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+    }
+    return url;
+  };
+
   const getPlaceholderImage = (name: string) => {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=f0fdf4&color=16a34a&size=512`;
   };
@@ -121,8 +130,9 @@ function App() {
             {products.map((p) => {
               const isSelected = selectedItems.has(p.id);
               const isReady = p.stock?.toLowerCase() === 'in stock' || p.stock?.toLowerCase() === 'ready';
+              const resolvedImage = resolveGoogleDriveUrl(p.image);
 
-              // Debug: console.log(`Rendering product ${p.name}: ${p.image}`);
+              // Debug: console.log(`Rendering product ${p.name}: ${resolvedImage}`);
 
               return (
                 <Card
@@ -133,11 +143,11 @@ function App() {
                 >
                   {/* Media Section - Ratio 4:5, flush to top */}
                   <div className="relative aspect-[4/5] w-full overflow-hidden bg-gray-100">
-                    {p.image && p.image.startsWith('http') ? (
+                    {resolvedImage && resolvedImage.startsWith('http') ? (
 
                       p.mediaType === 'video' ? (
                         <video
-                          src={p.image}
+                          src={resolvedImage}
                           autoPlay
                           muted
                           loop
@@ -146,12 +156,12 @@ function App() {
                         />
                       ) : (
                         <img
-                          src={p.image}
+                          src={resolvedImage}
                           alt={p.name}
                           loading="lazy"
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
-                            console.error(`Failed to load image for ${p.name}: ${p.image}`);
+                            console.error(`Failed to load image for ${p.name}: ${resolvedImage}`);
                             (e.target as HTMLImageElement).src = getPlaceholderImage(p.name);
                           }}
                         />

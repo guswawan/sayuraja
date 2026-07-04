@@ -21,6 +21,15 @@ async function getSheetValues(sheetId: string, range: string, apiKey: string): P
 	return data.values || [];
 }
 
+export function resolveGoogleDriveUrl(url: string | undefined): string | undefined {
+	if (!url) return url;
+	const match = url.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=download&)?id=|uc\?id=)|docs\.google\.com\/file\/d\/)([a-zA-Z0-9_-]{25,50})/);
+	if (match && match[1]) {
+		return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+	}
+	return url;
+}
+
 function getMediaType(url: string | undefined): 'image' | 'video' {
 	if (!url) return 'image';
 	const videoExtensions = ['.mp4', '.mov', '.webm', '.ogg'];
@@ -51,6 +60,7 @@ async function syncData(env: Env) {
 	// Process Products
 	for (const row of productRows) {
 		const [id, name, category, price, unit, image, stock] = row;
+		const resolvedImage = resolveGoogleDriveUrl(image);
 		
 		const context = `Produk: ${name}. Kategori: ${category}. Harga: Rp ${price} per ${unit}. Stok: ${stock}. Deskripsi: Jual ${name} segar berkualitas.`;
 
@@ -69,8 +79,8 @@ async function syncData(env: Env) {
 				unit, 
 				stock, 
 				id, 
-				image,
-				mediaType: getMediaType(image)
+				image: resolvedImage,
+				mediaType: getMediaType(resolvedImage)
 			},
 		});
 	}
@@ -142,7 +152,7 @@ export default {
 				const productRows = await getSheetValues(sheetId, "Product_Catalog!A2:G100", apiKey);
 				
 				const products = productRows.map(row => {
-					const imageLink = row[5];
+					const imageLink = resolveGoogleDriveUrl(row[5]);
 					return {
 						id: row[0],
 						name: row[1],
