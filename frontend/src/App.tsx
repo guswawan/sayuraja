@@ -92,7 +92,7 @@ function App() {
     if (!url) return url;
     const match = url.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=download&)?id=|uc\?id=)|docs\.google\.com\/file\/d\/)([a-zA-Z0-9_-]{25,50})/);
     if (match && match[1]) {
-      return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
     }
     return url;
   };
