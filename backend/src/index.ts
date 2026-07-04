@@ -23,9 +23,20 @@ async function getSheetValues(sheetId: string, range: string, apiKey: string): P
 
 export function resolveGoogleDriveUrl(url: string | undefined): string | undefined {
 	if (!url) return url;
-	const match = url.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=download&)?id=|uc\?id=)|docs\.google\.com\/file\/d\/)([a-zA-Z0-9_-]{25,50})/);
-	if (match && match[1]) {
-		return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+	try {
+		const pathMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]{25,50})/);
+		if (pathMatch && pathMatch[1]) {
+			return `https://drive.google.com/thumbnail?id=${pathMatch[1]}&sz=w1000`;
+		}
+		if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
+			const urlObj = new URL(url);
+			const id = urlObj.searchParams.get('id');
+			if (id && id.match(/^[a-zA-Z0-9_-]{25,50}$/)) {
+				return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
+			}
+		}
+	} catch (e) {
+		// Ignore parsing errors and return original url
 	}
 	return url;
 }
